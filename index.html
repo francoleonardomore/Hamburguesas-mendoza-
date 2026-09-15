@@ -573,12 +573,10 @@
   <header>
     <div class="header-inner">
       <a href="#" class="logo">
-        <!-- Reemplazá logo.png por el archivo o URL de tu logo -->
-        <img src="grok_1789487777102.png" alt="MORDISCO Logo" class="logo-img">
-
+        <img src="grok_1789487777102.png" alt="MORDISCO Logo" class="logo-img" loading="lazy">
         <span class="logo-text">MORDISCO</span>
       </a>
-      <button class="cart-btn" id="cartToggle">
+      <button class="cart-btn" id="cartToggle" aria-label="Abrir carrito">
         🛒 <span>Carrito</span>
         <span class="cart-count" id="cartCount">0</span>
       </button>
@@ -614,12 +612,11 @@
     </section>
   </main>
 
-  <!-- Panel del Carrito -->
   <div class="cart-overlay" id="cartOverlay">
     <div class="cart-panel">
       <div class="cart-header">
         <h3>Tu Pedido</h3>
-        <button class="close-cart" id="closeCart">&times;</button>
+        <button class="close-cart" id="closeCart" aria-label="Cerrar carrito">&times;</button>
       </div>
       <div class="cart-items" id="cartItems"></div>
       
@@ -674,7 +671,7 @@
       <div class="footer-col">
         <h4>Contacto</h4>
         <p>📍 Francisco de la Reta 815, Mendoza</p>
-        <p>💬 WhatsApp: <a href="#" id="footerWhatsapp">Enviar mensaje</a></p>
+        <p>💬 WhatsApp: <a href="#" id="footerWhatsapp" target="_blank" rel="noopener noreferrer">Enviar mensaje</a></p>
       </div>
     </div>
     <div class="footer-bottom">
@@ -683,8 +680,9 @@
   </footer>
 
   <script>
-    // ⚠️ REEMPLAZÁ ESTE NÚMERO POR TU WHATSAPP REAL (+54 9 261 642-5626)
-    const PHONE_NUMBER = "+54 9 261 642-5626";
+    // Número limpio únicamente con formato numérico para la API
+    const PHONE_NUMBER = "5492616425626";
+    const PHONE_DISPLAY = "+54 9 261 642-5626";
 
     const MENU_DATA = [
       { id: 1, name: "Mordisco clasica", desc: "Medallon de carne, doble queso cheddar, porción de papas.", price: 7500, emoji: "🍔" },
@@ -696,8 +694,7 @@
 
     let cart = [];
 
-    // Mostrar número en la pantalla
-    document.getElementById('whatsappDisplay').textContent = `+${PHONE_NUMBER}`;
+    document.getElementById('whatsappDisplay').textContent = PHONE_DISPLAY;
     document.getElementById('footerWhatsapp').href = `https://wa.me/${PHONE_NUMBER}`;
 
     const menuGrid = document.getElementById('menuGrid');
@@ -722,8 +719,8 @@
             <h3 class="card-title">${item.name}</h3>
             <p class="card-desc">${item.desc}</p>
             <div class="card-footer">
-              <span class="price">$${item.price.toLocaleString()}</span>
-              <button class="add-btn" onclick="addToCart(${item.id})">Agregar</button>
+              <span class="price">$${item.price.toLocaleString('es-AR')}</span>
+              <button class="add-btn" onclick="addToCart(${item.id})" aria-label="Agregar ${item.name} al carrito">Agregar</button>
             </div>
           </div>
         </div>
@@ -747,7 +744,7 @@
       const totalPrice = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
 
       cartCount.textContent = totalQty;
-      cartTotal.textContent = `$${totalPrice.toLocaleString()}`;
+      cartTotal.textContent = `$${totalPrice.toLocaleString('es-AR')}`;
 
       if (cart.length === 0) {
         cartItems.innerHTML = `
@@ -763,14 +760,14 @@
           <div class="cart-item">
             <div class="cart-item-info">
               <div class="cart-item-name">${item.name}</div>
-              <div class="cart-item-price">$${(item.price * item.qty).toLocaleString()}</div>
+              <div class="cart-item-price">$${(item.price * item.qty).toLocaleString('es-AR')}</div>
               <div class="qty-controls">
-                <button class="qty-btn" onclick="changeQty(${item.id}, -1)">-</button>
+                <button class="qty-btn" onclick="changeQty(${item.id}, -1)" aria-label="Disminuir cantidad">-</button>
                 <span class="qty-value">${item.qty}</span>
-                <button class="qty-btn" onclick="changeQty(${item.id}, 1)">+</button>
+                <button class="qty-btn" onclick="changeQty(${item.id}, 1)" aria-label="Aumentar cantidad">+</button>
               </div>
             </div>
-            <button class="remove-item" onclick="removeItem(${item.id})">Eliminar</button>
+            <button class="remove-item" onclick="removeItem(${item.id})" aria-label="Eliminar ${item.name} del carrito">Eliminar</button>
           </div>
         `).join('');
         orderForm.classList.add('show');
@@ -832,11 +829,11 @@
       text += `\n*Detalle del Pedido:*\n`;
 
       cart.forEach(item => {
-        text += `• ${item.qty}x ${item.name} - $${(item.price * item.qty).toLocaleString()}\n`;
+        text += `• ${item.qty}x ${item.name} - $${(item.price * item.qty).toLocaleString('es-AR')}\n`;
       });
 
       const totalPrice = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
-      text += `\n*Total a pagar:* $${totalPrice.toLocaleString()}`;
+      text += `\n*Total a pagar:* $${totalPrice.toLocaleString('es-AR')}`;
 
       const url = `https://wa.me/${PHONE_NUMBER}?text=${encodeURIComponent(text)}`;
       window.open(url, '_blank');

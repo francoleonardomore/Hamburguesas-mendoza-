@@ -502,8 +502,26 @@
       background: rgba(196,30,58,0.15);
     }
     .delivery-option label span, .payment-option label span { font-size: 1.5rem; }
-    .address-fields, .cash-fields { display: none; }
-    .address-fields.show, .cash-fields.show { display: block; }
+    .address-fields, .cash-fields, .mp-fields { display: none; }
+    .address-fields.show, .cash-fields.show, .mp-fields.show { display: block; }
+    
+    .mp-box {
+      background: rgba(0, 158, 227, 0.1);
+      border: 1px dashed rgba(0, 158, 227, 0.4);
+      border-radius: 12px;
+      padding: 1rem;
+      margin-bottom: 1.1rem;
+      text-align: center;
+      font-size: 0.9rem;
+    }
+    .mp-alias {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #009ee3;
+      user-select: all;
+      margin: 0.3rem 0;
+    }
+
     .checkout-btn { width: 100%; margin-top: 0.5rem; }
     footer {
       background: #0a0a0a;
@@ -669,6 +687,14 @@
           </div>
         </div>
 
+        <div class="mp-fields" id="mpFields">
+          <div class="mp-box">
+            <p>Transferí al siguiente Alias:</p>
+            <p class="mp-alias">Giuliana.more.alias</p>
+            <p><small>⚠️ Recordá enviar el comprobante por WhatsApp al confirmar.</small></p>
+          </div>
+        </div>
+
         <div class="form-group">
           <label for="clientNotes">Notas adicionales</label>
           <textarea id="clientNotes" placeholder="Aclaraciones sobre tu pedido..."></textarea>
@@ -735,6 +761,7 @@
     const cashRadio = document.getElementById('cash');
     const mpRadio = document.getElementById('mercadopago');
     const cashFields = document.getElementById('cashFields');
+    const mpFields = document.getElementById('mpFields');
     const toast = document.getElementById('toast');
 
     function renderMenu() {
@@ -831,8 +858,14 @@
     takeawayRadio.addEventListener('change', () => addressFields.classList.remove('show'));
     deliveryRadio.addEventListener('change', () => addressFields.classList.add('show'));
 
-    cashRadio.addEventListener('change', () => cashFields.classList.add('show'));
-    mpRadio.addEventListener('change', () => cashFields.classList.remove('show'));
+    cashRadio.addEventListener('change', () => {
+      cashFields.classList.add('show');
+      mpFields.classList.remove('show');
+    });
+    mpRadio.addEventListener('change', () => {
+      cashFields.classList.remove('show');
+      mpFields.classList.add('show');
+    });
 
     checkoutBtn.addEventListener('click', () => {
       const name = document.getElementById('clientName').value.trim();
@@ -860,6 +893,8 @@
       text += `*Medio de Pago:* ${isCash ? '💵 Efectivo' : '💙 Mercado Pago'}\n`;
       if (isCash && cashAmount) {
         text += `*Paga con:* $${cashAmount}\n`;
+      } else if (!isCash) {
+        text += `*Alias MP:* Giuliana.more.alias (Adjunto comprobante)\n`;
       }
 
       if (notes) text += `*Notas:* ${notes}\n`;

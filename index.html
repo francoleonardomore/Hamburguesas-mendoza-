@@ -764,213 +764,214 @@
   </footer>
 
   <script>
-    const PHONE_NUMBER = "+54 9 261 642-5626";
+  const PHONE_NUMBER = "+54 9 261 642-5626";
 
-    const MENU_DATA = [
-      { id: 1, name: "Mordisco clasica", desc: "Medallon de carne, doble queso cheddar, porción de papas.", price: 7500, emoji: "🍔" },
-      { id: 2, name: "Mordisco Americana", desc: "Doble medallon de carne, doble queso cheddar, panceta, salsa moridisco.", price: 9500, emoji: "🥓" },
-      { id: 3, name: "Big mordisco (12 CM)", desc: "4 medallones de carne, panceta, huevo frito, doble queso cheddar, salsa moridisco, porción de papas.", price: 18900, emoji: "👑" },
-      { id: 4, name: "Triple mordisco", desc: "3 medallones de carne, doble cheddar, huevo frito, cebolla, salsa mordisco y porcion de papas.", price: 16500, emoji: "🔥" },
-      { id: 5, name: "Mordisco street", desc: "2 medallones de carne, lechuga, tomate, doble queso cheddar, salsa mordisco, porción de papas.", price: 9500, emoji: "🍟" }
-    ];
+  const MENU_DATA = [
+    { id: 1, name: "Mordisco clasica", desc: "Medallon de carne, doble queso cheddar, porción de papas.", price: 7500, emoji: "🍔" },
+    { id: 2, name: "Mordisco Americana", desc: "Doble medallon de carne, doble queso cheddar, panceta, salsa moridisco.", price: 9500, emoji: "🥓" },
+    { id: 3, name: "Big mordisco (12 CM)", desc: "4 medallones de carne, panceta, huevo frito, doble queso cheddar, salsa moridisco, porción de papas.", price: 18900, emoji: "👑" },
+    { id: 4, name: "Triple mordisco", desc: "3 medallones de carne, doble cheddar, huevo frito, cebolla, salsa mordisco y porcion de papas.", price: 16500, emoji: "🔥" },
+    { id: 5, name: "Mordisco street", desc: "2 medallones de carne, lechuga, tomate, doble queso cheddar, salsa mordisco, porción de papas.", price: 9500, emoji: "🍟" }
+  ];
 
-    let cart = [];
-    let pendingWhatsappUrl = "";
+  let cart = [];
+  let pendingWhatsappUrl = "";
 
-    document.getElementById('whatsappDisplay').textContent = `+${PHONE_NUMBER}`;
-    document.getElementById('footerWhatsapp').href = `https://wa.me/${PHONE_NUMBER}`;
+  document.getElementById('whatsappDisplay').textContent = `+${PHONE_NUMBER}`;
+  document.getElementById('footerWhatsapp').href = `https://wa.me/${PHONE_NUMBER}`;
 
-    const menuGrid = document.getElementById('menuGrid');
-    const cartToggle = document.getElementById('cartToggle');
-    const cartOverlay = document.getElementById('cartOverlay');
-    const closeCart = document.getElementById('closeCart');
-    const cartItems = document.getElementById('cartItems');
-    const cartCount = document.getElementById('cartCount');
-    const cartTotal = document.getElementById('cartTotal');
-    const checkoutBtn = document.getElementById('checkoutBtn');
-    const orderForm = document.getElementById('orderForm');
-    const takeawayRadio = document.getElementById('takeaway');
-    const deliveryRadio = document.getElementById('delivery');
-    const addressFields = document.getElementById('addressFields');
-    const cashRadio = document.getElementById('cash');
-    const mpRadio = document.getElementById('mercadopago');
-    const cashFields = document.getElementById('cashFields');
-    const cartMainView = document.getElementById('cartMainView');
-    const mpConfirmationView = document.getElementById('mpConfirmationView');
-    const mpTotalDisplay = document.getElementById('mpTotalDisplay');
-    const continueMpBtn = document.getElementById('continueMpBtn');
-    const panelTitle = document.getElementById('panelTitle');
-    const toast = document.getElementById('toast');
+  const menuGrid = document.getElementById('menuGrid');
+  const cartToggle = document.getElementById('cartToggle');
+  const cartOverlay = document.getElementById('cartOverlay');
+  const closeCart = document.getElementById('closeCart');
+  const cartItems = document.getElementById('cartItems');
+  const cartCount = document.getElementById('cartCount');
+  const cartTotal = document.getElementById('cartTotal');
+  const checkoutBtn = document.getElementById('checkoutBtn');
+  const orderForm = document.getElementById('orderForm');
+  const takeawayRadio = document.getElementById('takeaway');
+  const deliveryRadio = document.getElementById('delivery');
+  const addressFields = document.getElementById('addressFields');
+  const cashRadio = document.getElementById('cash');
+  const mpRadio = document.getElementById('mercadopago');
+  const cashFields = document.getElementById('cashFields');
+  const cartMainView = document.getElementById('cartMainView');
+  const mpConfirmationView = document.getElementById('mpConfirmationView');
+  const mpTotalDisplay = document.getElementById('mpTotalDisplay');
+  const continueMpBtn = document.getElementById('continueMpBtn');
+  const panelTitle = document.getElementById('panelTitle');
+  const toast = document.getElementById('toast');
 
-    function renderMenu() {
-      menuGrid.innerHTML = MENU_DATA.map(item => `
-        <div class="card">
-          <div class="card-img">${item.emoji}</div>
-          <div class="card-body">
-            <h3 class="card-title">${item.name}</h3>
-            <p class="card-desc">${item.desc}</p>
-            <div class="card-footer">
-              <span class="price">$${item.price.toLocaleString()}</span>
-              <button class="add-btn" onclick="addToCart(${item.id})">Agregar</button>
-            </div>
+  function renderMenu() {
+    menuGrid.innerHTML = MENU_DATA.map(item => `
+      <div class="card">
+        <div class="card-img">${item.emoji}</div>
+        <div class="card-body">
+          <h3 class="card-title">${item.name}</h3>
+          <p class="card-desc">${item.desc}</p>
+          <div class="card-footer">
+            <span class="price">$${item.price.toLocaleString()}</span>
+            <button class="add-btn" onclick="addToCart(${item.id})">Agregar</button>
           </div>
         </div>
-      `).join('');
+      </div>
+    `).join('');
+  }
+
+  window.addToCart = function(id) {
+    const item = MENU_DATA.find(p => p.id === id);
+    const existing = cart.find(ci => ci.id === id);
+    if (existing) {
+      existing.qty++;
+    } else {
+      cart.push({ ...item, qty: 1 });
     }
-
-    window.addToCart = function(id) {
-      const item = MENU_DATA.find(p => p.id === id);
-      const existing = cart.find(ci => ci.id === id);
-      if (existing) {
-        existing.qty++;
-      } else {
-        cart.push({ ...item, qty: 1 });
-      }
-      updateCart();
-      showToast();
-    }
-
-    function updateCart() {
-      const totalQty = cart.reduce((sum, item) => sum + item.qty, 0);
-      const totalPrice = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
-
-      cartCount.textContent = totalQty;
-      cartTotal.textContent = `$${totalPrice.toLocaleString()}`;
-
-      if (cart.length === 0) {
-        cartItems.innerHTML = `
-          <div class="cart-empty">
-            <div class="cart-empty-icon">🛒</div>
-            <p>Tu carrito está vacío</p>
-          </div>
-        `;
-        orderForm.classList.remove('show');
-        checkoutBtn.disabled = true;
-      } else {
-        cartItems.innerHTML = cart.map(item => `
-          <div class="cart-item">
-            <div class="cart-item-info">
-              <div class="cart-item-name">${item.name}</div>
-              <div class="cart-item-price">$${(item.price * item.qty).toLocaleString()}</div>
-              <div class="qty-controls">
-                <button class="qty-btn" onclick="changeQty(${item.id}, -1)">-</button>
-                <span class="qty-value">${item.qty}</span>
-                <button class="qty-btn" onclick="changeQty(${item.id}, 1)">+</button>
-              </div>
-            </div>
-            <button class="remove-item" onclick="removeItem(${item.id})">Eliminar</button>
-          </div>
-        `).join('');
-        orderForm.classList.add('show');
-        checkoutBtn.disabled = false;
-      }
-    }
-
-    window.changeQty = function(id, delta) {
-      const item = cart.find(ci => ci.id === id);
-      if (item) {
-        item.qty += delta;
-        if (item.qty <= 0) {
-          cart = cart.filter(ci => ci.id !== id);
-        }
-      }
-      updateCart();
-    }
-
-    window.removeItem = function(id) {
-      cart = cart.filter(ci => ci.id !== id);
-      updateCart();
-    }
-
-    function showToast() {
-      toast.classList.add('show');
-      setTimeout(() => toast.classList.remove('show'), 2000);
-    }
-
-    function resetCartView() {
-      cartMainView.style.display = 'flex';
-      mpConfirmationView.classList.remove('show');
-      panelTitle.textContent = 'Tu Pedido';
-    }
-
-    cartToggle.addEventListener('click', () => {
-      resetCartView();
-      cartOverlay.classList.add('open');
-    });
-
-    closeCart.addEventListener('click', () => cartOverlay.classList.remove('open'));
-    cartOverlay.addEventListener('click', (e) => {
-      if (e.target === cartOverlay) cartOverlay.classList.remove('open');
-    });
-
-    takeawayRadio.addEventListener('change', () => addressFields.classList.remove('show'));
-    deliveryRadio.addEventListener('change', () => addressFields.classList.add('show'));
-
-    cashRadio.addEventListener('change', () => cashFields.classList.add('show'));
-    mpRadio.addEventListener('change', () => cashFields.classList.remove('show'));
-
-    checkoutBtn.addEventListener('click', () => {
-      const name = document.getElementById('clientName').value.trim();
-      const isDelivery = deliveryRadio.checked;
-      const address = document.getElementById('clientAddress').value.trim();
-      const isCash = cashRadio.checked;
-      const cashAmount = document.getElementById('cashAmount').value.trim();
-      const notes = document.getElementById('clientNotes').value.trim();
-
-      if (!name) {
-        alert('Por favor decinos tu nombre para completar el pedido.');
-        return;
-      }
-
-      if (isDelivery && !address) {
-        alert('Por favor ingresá tu dirección para el envío.');
-        return;
-      }
-
-      let text = `*NUEVO PEDIDO - MORDISCO*\n\n`;
-      text += `*Cliente:* ${name}\n`;
-      text += `*Entrega:* ${isDelivery ? '🛵 Delivery' : '🛍️ Retiro en local'}\n`;
-      if (isDelivery) text += `*Dirección:* ${address}\n`;
-      
-      text += `*Medio de Pago:* ${isCash ? '💵 Efectivo' : '💙 Mercado Pago'}\n`;
-      if (isCash && cashAmount) {
-        text += `*Paga con:* $${cashAmount}\n`;
-      } else if (!isCash) {
-        text += `*Alias MP:* Giuliana.more.alias (Adjunto comprobante)\n`;
-      }
-
-      if (notes) text += `*Notas:* ${notes}\n`;
-      text += `\n*Detalle del Pedido:*\n`;
-
-      cart.forEach(item => {
-        text += `• ${item.qty}x ${item.name} - $${(item.price * item.qty).toLocaleString()}\n`;
-      });
-
-      const totalPrice = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
-      text += `\n*Total a pagar:* $${totalPrice.toLocaleString()}`;
-
-      const url = `https://wa.me/${PHONE_NUMBER}?text=${encodeURIComponent(text)}`;
-
-      if (isCash) {
-        window.open(url, '_blank');
-      } else {
-        // Guardar URL y mostrar pantalla de MP con Alias
-        pendingWhatsappUrl = url;
-        mpTotalDisplay.textContent = `$${totalPrice.toLocaleString()}`;
-        cartMainView.style.display = 'none';
-        mpConfirmationView.classList.add('show');
-        panelTitle.textContent = 'Pago por Mercado Pago';
-      }
-    });
-
-    continueMpBtn.addEventListener('click', () => {
-      if (pendingWhatsappUrl) {
-        window.open(pendingWhatsappUrl, '_blank');
-      }
-    });
-
-    renderMenu();
     updateCart();
-  </script>
+    showToast();
+  }
+
+  function updateCart() {
+    const totalQty = cart.reduce((sum, item) => sum + item.qty, 0);
+    const totalPrice = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+
+    cartCount.textContent = totalQty;
+    cartTotal.textContent = `$${totalPrice.toLocaleString()}`;
+
+    if (cart.length === 0) {
+      cartItems.innerHTML = `
+        <div class="cart-empty">
+          <div class="cart-empty-icon">🛒</div>
+          <p>Tu carrito está vacío</p>
+        </div>
+      `;
+      orderForm.classList.remove('show');
+      checkoutBtn.disabled = true;
+    } else {
+      cartItems.innerHTML = cart.map(item => `
+        <div class="cart-item">
+          <div class="cart-item-info">
+            <div class="cart-item-name">${item.name}</div>
+            <div class="cart-item-price">$${(item.price * item.qty).toLocaleString()}</div>
+            <div class="qty-controls">
+              <button class="qty-btn" onclick="changeQty(${item.id}, -1)">-</button>
+              <span class="qty-value">${item.qty}</span>
+              <button class="qty-btn" onclick="changeQty(${item.id}, 1)">+</button>
+            </div>
+          </div>
+          <button class="remove-item" onclick="removeItem(${item.id})">Eliminar</button>
+        </div>
+      `).join('');
+      orderForm.classList.add('show');
+      checkoutBtn.disabled = false;
+    }
+  }
+
+  window.changeQty = function(id, delta) {
+    const item = cart.find(ci => ci.id === id);
+    if (item) {
+      item.qty += delta;
+      if (item.qty <= 0) {
+        cart = cart.filter(ci => ci.id !== id);
+      }
+    }
+    updateCart();
+  }
+
+  window.removeItem = function(id) {
+    cart = cart.filter(ci => ci.id !== id);
+    updateCart();
+  }
+
+  function showToast() {
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 2000);
+  }
+
+  function resetCartView() {
+    cartMainView.style.display = 'flex';
+    mpConfirmationView.classList.remove('show');
+    panelTitle.textContent = 'Tu Pedido';
+  }
+
+  cartToggle.addEventListener('click', () => {
+    resetCartView();
+    cartOverlay.classList.add('open');
+  });
+
+  closeCart.addEventListener('click', () => cartOverlay.classList.remove('open'));
+  cartOverlay.addEventListener('click', (e) => {
+    if (e.target === cartOverlay) cartOverlay.classList.remove('open');
+  });
+
+  takeawayRadio.addEventListener('change', () => addressFields.classList.remove('show'));
+  deliveryRadio.addEventListener('change', () => addressFields.classList.add('show'));
+
+  cashRadio.addEventListener('change', () => cashFields.classList.add('show'));
+  mpRadio.addEventListener('change', () => cashFields.classList.remove('show'));
+
+  checkoutBtn.addEventListener('click', () => {
+    const name = document.getElementById('clientName').value.trim();
+    const isDelivery = deliveryRadio.checked;
+    const address = document.getElementById('clientAddress').value.trim();
+    const isCash = cashRadio.checked;
+    const cashAmount = document.getElementById('cashAmount').value.trim();
+    const notes = document.getElementById('clientNotes').value.trim();
+
+    if (!name) {
+      alert('Por favor decinos tu nombre para completar el pedido.');
+      return;
+    }
+
+    if (isDelivery && !address) {
+      alert('Por favor ingresá tu dirección para el envío.');
+      return;
+    }
+
+    let text = `*NUEVO PEDIDO - MORDISCO*\n\n`;
+    text += `*Cliente:* ${name}\n`;
+    text += `*Entrega:* ${isDelivery ? '🛵 Delivery' : '🛍️ Retiro en local'}\n`;
+    if (isDelivery) text += `*Dirección:* ${address}\n`;
+    
+    text += `*Medio de Pago:* ${isCash ? '💵 Efectivo' : '💙 Mercado Pago'}\n`;
+    if (isCash && cashAmount) {
+      text += `*Paga con:* $${cashAmount}\n`;
+    } else if (!isCash) {
+      text += `*Alias MP:* Giuliana.more.alias (Adjunto comprobante)\n`;
+    }
+
+    if (notes) text += `*Notas:* ${notes}\n`;
+    text += `\n*Detalle del Pedido:*\n`;
+
+    cart.forEach(item => {
+      text += `• ${item.qty}x ${item.name} - $${(item.price * item.qty).toLocaleString()}\n`;
+    });
+
+    const totalPrice = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+    text += `\n*Total a pagar:* $${totalPrice.toLocaleString()}`;
+
+    const url = `https://wa.me/${PHONE_NUMBER}?text=${encodeURIComponent(text)}`;
+
+    if (isCash) {
+      // Si el pago es en efectivo, redirige directamente a WhatsApp
+      window.open(url, '_blank');
+    } else {
+      // Si el pago es Mercado Pago, oculta el carrito y muestra la vista de transferencia
+      pendingWhatsappUrl = url;
+      mpTotalDisplay.textContent = `$${totalPrice.toLocaleString()}`;
+      cartMainView.style.display = 'none';
+      mpConfirmationView.classList.add('show');
+      panelTitle.textContent = 'Pago por Mercado Pago';
+    }
+  });
+
+  continueMpBtn.addEventListener('click', () => {
+    if (pendingWhatsappUrl) {
+      window.open(pendingWhatsappUrl, '_blank');
+    }
+  });
+
+  renderMenu();
+  updateCart();
+</script>
 </body>
 </html>

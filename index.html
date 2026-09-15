@@ -342,6 +342,7 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
+      flex-shrink: 0;
     }
     .cart-header h3 { font-size: 1.3rem; font-weight: 700; }
     .close-cart {
@@ -354,9 +355,14 @@
       line-height: 1;
     }
     .close-cart:hover { color: var(--text); }
-    .cart-items {
+    
+    /* Área scrollable que contiene productos y formulario */
+    .cart-scroll-area {
       flex: 1;
       overflow-y: auto;
+    }
+    
+    .cart-items {
       padding: 1rem 1.5rem;
     }
     .cart-empty {
@@ -421,6 +427,7 @@
       padding: 1.5rem;
       border-top: 1px solid rgba(255,255,255,0.08);
       background: rgba(0,0,0,0.2);
+      flex-shrink: 0;
     }
     .cart-total {
       display: flex;
@@ -437,8 +444,6 @@
     .order-form {
       display: none;
       padding: 0 1.5rem 1.5rem;
-      overflow-y: auto;
-      max-height: 60vh;
     }
     .order-form.show { display: block; }
     .form-group { margin-bottom: 1.1rem; }
@@ -510,6 +515,8 @@
       display: none;
       padding: 2rem 1.5rem;
       text-align: center;
+      overflow-y: auto;
+      flex: 1;
     }
     .mp-confirmation.show {
       display: flex;
@@ -657,62 +664,64 @@
       </div>
 
       <!-- Vista Estándar del Carrito -->
-      <div id="cartMainView" style="display: flex; flex-direction: column; height: 100%;">
-        <div class="cart-items" id="cartItems"></div>
-        
-        <form class="order-form" id="orderForm">
-          <div class="form-group">
-            <label>Tipo de Entrega</label>
-            <div class="delivery-options">
-              <div class="delivery-option">
-                <input type="radio" id="takeaway" name="deliveryType" value="takeaway" checked>
-                <label for="takeaway"><span>🛍️</span>Retiro en Local</label>
-              </div>
-              <div class="delivery-option">
-                <input type="radio" id="delivery" name="deliveryType" value="delivery">
-                <label for="delivery"><span>🛵</span>Delivery</label>
-              </div>
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label>Método de Pago</label>
-            <div class="payment-options">
-              <div class="payment-option">
-                <input type="radio" id="cash" name="paymentType" value="cash" checked>
-                <label for="cash"><span>💵</span>Efectivo</label>
-              </div>
-              <div class="payment-option">
-                <input type="radio" id="mercadopago" name="paymentType" value="mercadopago">
-                <label for="mercadopago"><span>💙</span>Mercado Pago</label>
-              </div>
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label for="clientName">Nombre completo</label>
-            <input type="text" id="clientName" required placeholder="Tu nombre">
-          </div>
-
-          <div class="address-fields" id="addressFields">
+      <div id="cartMainView" style="display: flex; flex-direction: column; flex: 1; overflow: hidden;">
+        <div class="cart-scroll-area">
+          <div class="cart-items" id="cartItems"></div>
+          
+          <form class="order-form" id="orderForm">
             <div class="form-group">
-              <label for="clientAddress">Dirección de entrega</label>
-              <input type="text" id="clientAddress" placeholder="Calle y número">
+              <label>Tipo de Entrega</label>
+              <div class="delivery-options">
+                <div class="delivery-option">
+                  <input type="radio" id="takeaway" name="deliveryType" value="takeaway" checked>
+                  <label for="takeaway"><span>🛍️</span>Retiro en Local</label>
+                </div>
+                <div class="delivery-option">
+                  <input type="radio" id="delivery" name="deliveryType" value="delivery">
+                  <label for="delivery"><span>🛵</span>Delivery</label>
+                </div>
+              </div>
             </div>
-          </div>
 
-          <div class="cash-fields show" id="cashFields">
             <div class="form-group">
-              <label for="cashAmount">¿Con cuánto abonás? (para el cambio)</label>
-              <input type="number" id="cashAmount" placeholder="Ej: 10000 (o dejá vacío si es justo)">
+              <label>Método de Pago</label>
+              <div class="payment-options">
+                <div class="payment-option">
+                  <input type="radio" id="cash" name="paymentType" value="cash" checked>
+                  <label for="cash"><span>💵</span>Efectivo</label>
+                </div>
+                <div class="payment-option">
+                  <input type="radio" id="mercadopago" name="paymentType" value="mercadopago">
+                  <label for="mercadopago"><span>💙</span>Mercado Pago</label>
+                </div>
+              </div>
             </div>
-          </div>
 
-          <div class="form-group">
-            <label for="clientNotes">Notas adicionales</label>
-            <textarea id="clientNotes" placeholder="Aclaraciones sobre tu pedido..."></textarea>
-          </div>
-        </form>
+            <div class="form-group">
+              <label for="clientName">Nombre completo</label>
+              <input type="text" id="clientName" required placeholder="Tu nombre">
+            </div>
+
+            <div class="address-fields" id="addressFields">
+              <div class="form-group">
+                <label for="clientAddress">Dirección de entrega</label>
+                <input type="text" id="clientAddress" placeholder="Calle y número">
+              </div>
+            </div>
+
+            <div class="cash-fields show" id="cashFields">
+              <div class="form-group">
+                <label for="cashAmount">¿Con cuánto abonás? (para el cambio)</label>
+                <input type="number" id="cashAmount" placeholder="Ej: 10000 (o dejá vacío si es justo)">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="clientNotes">Notas adicionales</label>
+              <textarea id="clientNotes" placeholder="Aclaraciones sobre tu pedido..."></textarea>
+            </div>
+          </form>
+        </div>
 
         <div class="cart-footer">
           <div class="cart-total">
@@ -952,10 +961,8 @@
     const url = `https://wa.me/${PHONE_NUMBER}?text=${encodeURIComponent(text)}`;
 
     if (isCash) {
-      // Si el pago es en efectivo, redirige directamente a WhatsApp
       window.open(url, '_blank');
     } else {
-      // Si el pago es Mercado Pago, oculta el carrito y muestra la vista de transferencia
       pendingWhatsappUrl = url;
       mpTotalDisplay.textContent = `$${totalPrice.toLocaleString()}`;
       cartMainView.style.display = 'none';

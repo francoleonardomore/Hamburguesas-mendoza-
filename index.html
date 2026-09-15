@@ -469,20 +469,20 @@
       resize: vertical;
       min-height: 80px;
     }
-    .delivery-options {
+    .delivery-options, .payment-options {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 0.75rem;
       margin-bottom: 1.1rem;
     }
-    .delivery-option { position: relative; }
-    .delivery-option input {
+    .delivery-option, .payment-option { position: relative; }
+    .delivery-option input, .payment-option input {
       position: absolute;
       opacity: 0;
       width: 0;
       height: 0;
     }
-    .delivery-option label {
+    .delivery-option label, .payment-option label {
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -497,13 +497,13 @@
       font-size: 0.9rem;
       font-weight: 600;
     }
-    .delivery-option input:checked + label {
+    .delivery-option input:checked + label, .payment-option input:checked + label {
       border-color: var(--primary);
       background: rgba(196,30,58,0.15);
     }
-    .delivery-option label span { font-size: 1.5rem; }
-    .address-fields { display: none; }
-    .address-fields.show { display: block; }
+    .delivery-option label span, .payment-option label span { font-size: 1.5rem; }
+    .address-fields, .cash-fields { display: none; }
+    .address-fields.show, .cash-fields.show { display: block; }
     .checkout-btn { width: 100%; margin-top: 0.5rem; }
     footer {
       background: #0a0a0a;
@@ -573,10 +573,10 @@
   <header>
     <div class="header-inner">
       <a href="#" class="logo">
-        <img src="grok_1789487777102.png" alt="MORDISCO Logo" class="logo-img" loading="lazy">
+        <img src="grok_1789487777102.png" alt="MORDISCO Logo" class="logo-img">
         <span class="logo-text">MORDISCO</span>
       </a>
-      <button class="cart-btn" id="cartToggle" aria-label="Abrir carrito">
+      <button class="cart-btn" id="cartToggle">
         🛒 <span>Carrito</span>
         <span class="cart-count" id="cartCount">0</span>
       </button>
@@ -612,11 +612,12 @@
     </section>
   </main>
 
+  <!-- Panel del Carrito -->
   <div class="cart-overlay" id="cartOverlay">
     <div class="cart-panel">
       <div class="cart-header">
         <h3>Tu Pedido</h3>
-        <button class="close-cart" id="closeCart" aria-label="Cerrar carrito">&times;</button>
+        <button class="close-cart" id="closeCart">&times;</button>
       </div>
       <div class="cart-items" id="cartItems"></div>
       
@@ -634,16 +635,40 @@
             </div>
           </div>
         </div>
+
+        <div class="form-group">
+          <label>Método de Pago</label>
+          <div class="payment-options">
+            <div class="payment-option">
+              <input type="radio" id="cash" name="paymentType" value="cash" checked>
+              <label for="cash"><span>💵</span>Efectivo</label>
+            </div>
+            <div class="payment-option">
+              <input type="radio" id="mercadopago" name="paymentType" value="mercadopago">
+              <label for="mercadopago"><span>💙</span>Mercado Pago</label>
+            </div>
+          </div>
+        </div>
+
         <div class="form-group">
           <label for="clientName">Nombre completo</label>
           <input type="text" id="clientName" required placeholder="Tu nombre">
         </div>
+
         <div class="address-fields" id="addressFields">
           <div class="form-group">
             <label for="clientAddress">Dirección de entrega</label>
             <input type="text" id="clientAddress" placeholder="Calle y número">
           </div>
         </div>
+
+        <div class="cash-fields show" id="cashFields">
+          <div class="form-group">
+            <label for="cashAmount">¿Con cuánto abonás? (para el cambio)</label>
+            <input type="number" id="cashAmount" placeholder="Ej: 10000 (o dejá vacío si es justo)">
+          </div>
+        </div>
+
         <div class="form-group">
           <label for="clientNotes">Notas adicionales</label>
           <textarea id="clientNotes" placeholder="Aclaraciones sobre tu pedido..."></textarea>
@@ -671,7 +696,7 @@
       <div class="footer-col">
         <h4>Contacto</h4>
         <p>📍 Francisco de la Reta 815, Mendoza</p>
-        <p>💬 WhatsApp: <a href="#" id="footerWhatsapp" target="_blank" rel="noopener noreferrer">Enviar mensaje</a></p>
+        <p>💬 WhatsApp: <a href="#" id="footerWhatsapp">Enviar mensaje</a></p>
       </div>
     </div>
     <div class="footer-bottom">
@@ -680,9 +705,7 @@
   </footer>
 
   <script>
-    // Número limpio únicamente con formato numérico para la API
-    const PHONE_NUMBER = "5492616425626";
-    const PHONE_DISPLAY = "+54 9 261 642-5626";
+    const PHONE_NUMBER = "+54 9 261 642-5626";
 
     const MENU_DATA = [
       { id: 1, name: "Mordisco clasica", desc: "Medallon de carne, doble queso cheddar, porción de papas.", price: 7500, emoji: "🍔" },
@@ -694,7 +717,7 @@
 
     let cart = [];
 
-    document.getElementById('whatsappDisplay').textContent = PHONE_DISPLAY;
+    document.getElementById('whatsappDisplay').textContent = `+${PHONE_NUMBER}`;
     document.getElementById('footerWhatsapp').href = `https://wa.me/${PHONE_NUMBER}`;
 
     const menuGrid = document.getElementById('menuGrid');
@@ -709,6 +732,9 @@
     const takeawayRadio = document.getElementById('takeaway');
     const deliveryRadio = document.getElementById('delivery');
     const addressFields = document.getElementById('addressFields');
+    const cashRadio = document.getElementById('cash');
+    const mpRadio = document.getElementById('mercadopago');
+    const cashFields = document.getElementById('cashFields');
     const toast = document.getElementById('toast');
 
     function renderMenu() {
@@ -719,8 +745,8 @@
             <h3 class="card-title">${item.name}</h3>
             <p class="card-desc">${item.desc}</p>
             <div class="card-footer">
-              <span class="price">$${item.price.toLocaleString('es-AR')}</span>
-              <button class="add-btn" onclick="addToCart(${item.id})" aria-label="Agregar ${item.name} al carrito">Agregar</button>
+              <span class="price">$${item.price.toLocaleString()}</span>
+              <button class="add-btn" onclick="addToCart(${item.id})">Agregar</button>
             </div>
           </div>
         </div>
@@ -744,7 +770,7 @@
       const totalPrice = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
 
       cartCount.textContent = totalQty;
-      cartTotal.textContent = `$${totalPrice.toLocaleString('es-AR')}`;
+      cartTotal.textContent = `$${totalPrice.toLocaleString()}`;
 
       if (cart.length === 0) {
         cartItems.innerHTML = `
@@ -760,14 +786,14 @@
           <div class="cart-item">
             <div class="cart-item-info">
               <div class="cart-item-name">${item.name}</div>
-              <div class="cart-item-price">$${(item.price * item.qty).toLocaleString('es-AR')}</div>
+              <div class="cart-item-price">$${(item.price * item.qty).toLocaleString()}</div>
               <div class="qty-controls">
-                <button class="qty-btn" onclick="changeQty(${item.id}, -1)" aria-label="Disminuir cantidad">-</button>
+                <button class="qty-btn" onclick="changeQty(${item.id}, -1)">-</button>
                 <span class="qty-value">${item.qty}</span>
-                <button class="qty-btn" onclick="changeQty(${item.id}, 1)" aria-label="Aumentar cantidad">+</button>
+                <button class="qty-btn" onclick="changeQty(${item.id}, 1)">+</button>
               </div>
             </div>
-            <button class="remove-item" onclick="removeItem(${item.id})" aria-label="Eliminar ${item.name} del carrito">Eliminar</button>
+            <button class="remove-item" onclick="removeItem(${item.id})">Eliminar</button>
           </div>
         `).join('');
         orderForm.classList.add('show');
@@ -805,10 +831,15 @@
     takeawayRadio.addEventListener('change', () => addressFields.classList.remove('show'));
     deliveryRadio.addEventListener('change', () => addressFields.classList.add('show'));
 
+    cashRadio.addEventListener('change', () => cashFields.classList.add('show'));
+    mpRadio.addEventListener('change', () => cashFields.classList.remove('show'));
+
     checkoutBtn.addEventListener('click', () => {
       const name = document.getElementById('clientName').value.trim();
       const isDelivery = deliveryRadio.checked;
       const address = document.getElementById('clientAddress').value.trim();
+      const isCash = cashRadio.checked;
+      const cashAmount = document.getElementById('cashAmount').value.trim();
       const notes = document.getElementById('clientNotes').value.trim();
 
       if (!name) {
@@ -825,15 +856,21 @@
       text += `*Cliente:* ${name}\n`;
       text += `*Entrega:* ${isDelivery ? '🛵 Delivery' : '🛍️ Retiro en local'}\n`;
       if (isDelivery) text += `*Dirección:* ${address}\n`;
+      
+      text += `*Medio de Pago:* ${isCash ? '💵 Efectivo' : '💙 Mercado Pago'}\n`;
+      if (isCash && cashAmount) {
+        text += `*Paga con:* $${cashAmount}\n`;
+      }
+
       if (notes) text += `*Notas:* ${notes}\n`;
       text += `\n*Detalle del Pedido:*\n`;
 
       cart.forEach(item => {
-        text += `• ${item.qty}x ${item.name} - $${(item.price * item.qty).toLocaleString('es-AR')}\n`;
+        text += `• ${item.qty}x ${item.name} - $${(item.price * item.qty).toLocaleString()}\n`;
       });
 
       const totalPrice = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
-      text += `\n*Total a pagar:* $${totalPrice.toLocaleString('es-AR')}`;
+      text += `\n*Total a pagar:* $${totalPrice.toLocaleString()}`;
 
       const url = `https://wa.me/${PHONE_NUMBER}?text=${encodeURIComponent(text)}`;
       window.open(url, '_blank');

@@ -502,24 +502,42 @@
       background: rgba(196,30,58,0.15);
     }
     .delivery-option label span, .payment-option label span { font-size: 1.5rem; }
-    .address-fields, .cash-fields, .mp-fields { display: none; }
-    .address-fields.show, .cash-fields.show, .mp-fields.show { display: block; }
+    .address-fields, .cash-fields { display: none; }
+    .address-fields.show, .cash-fields.show { display: block; }
     
-    .mp-box {
-      background: rgba(0, 158, 227, 0.1);
-      border: 1px dashed rgba(0, 158, 227, 0.4);
-      border-radius: 12px;
-      padding: 1rem;
-      margin-bottom: 1.1rem;
+    /* Pantalla de Confirmación MP */
+    .mp-confirmation {
+      display: none;
+      padding: 2rem 1.5rem;
       text-align: center;
-      font-size: 0.9rem;
+    }
+    .mp-confirmation.show {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+    }
+    .mp-box {
+      width: 100%;
+      background: rgba(0, 158, 227, 0.08);
+      border: 1px dashed rgba(0, 158, 227, 0.4);
+      border-radius: 16px;
+      padding: 1.25rem;
+      margin: 0.5rem 0;
     }
     .mp-alias {
-      font-size: 1.1rem;
-      font-weight: 700;
+      font-size: 1.2rem;
+      font-weight: 800;
       color: #009ee3;
       user-select: all;
-      margin: 0.3rem 0;
+      margin: 0.5rem 0;
+      word-break: break-all;
+    }
+    .mp-amount {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--accent);
+      margin-bottom: 0.5rem;
     }
 
     .checkout-btn { width: 100%; margin-top: 0.5rem; }
@@ -634,80 +652,95 @@
   <div class="cart-overlay" id="cartOverlay">
     <div class="cart-panel">
       <div class="cart-header">
-        <h3>Tu Pedido</h3>
+        <h3 id="panelTitle">Tu Pedido</h3>
         <button class="close-cart" id="closeCart">&times;</button>
       </div>
-      <div class="cart-items" id="cartItems"></div>
-      
-      <form class="order-form" id="orderForm">
-        <div class="form-group">
-          <label>Tipo de Entrega</label>
-          <div class="delivery-options">
-            <div class="delivery-option">
-              <input type="radio" id="takeaway" name="deliveryType" value="takeaway" checked>
-              <label for="takeaway"><span>🛍️</span>Retiro en Local</label>
-            </div>
-            <div class="delivery-option">
-              <input type="radio" id="delivery" name="deliveryType" value="delivery">
-              <label for="delivery"><span>🛵</span>Delivery</label>
-            </div>
-          </div>
-        </div>
 
-        <div class="form-group">
-          <label>Método de Pago</label>
-          <div class="payment-options">
-            <div class="payment-option">
-              <input type="radio" id="cash" name="paymentType" value="cash" checked>
-              <label for="cash"><span>💵</span>Efectivo</label>
-            </div>
-            <div class="payment-option">
-              <input type="radio" id="mercadopago" name="paymentType" value="mercadopago">
-              <label for="mercadopago"><span>💙</span>Mercado Pago</label>
-            </div>
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label for="clientName">Nombre completo</label>
-          <input type="text" id="clientName" required placeholder="Tu nombre">
-        </div>
-
-        <div class="address-fields" id="addressFields">
+      <!-- Vista Estándar del Carrito -->
+      <div id="cartMainView" style="display: flex; flex-direction: column; height: 100%;">
+        <div class="cart-items" id="cartItems"></div>
+        
+        <form class="order-form" id="orderForm">
           <div class="form-group">
-            <label for="clientAddress">Dirección de entrega</label>
-            <input type="text" id="clientAddress" placeholder="Calle y número">
+            <label>Tipo de Entrega</label>
+            <div class="delivery-options">
+              <div class="delivery-option">
+                <input type="radio" id="takeaway" name="deliveryType" value="takeaway" checked>
+                <label for="takeaway"><span>🛍️</span>Retiro en Local</label>
+              </div>
+              <div class="delivery-option">
+                <input type="radio" id="delivery" name="deliveryType" value="delivery">
+                <label for="delivery"><span>🛵</span>Delivery</label>
+              </div>
+            </div>
           </div>
-        </div>
 
-        <div class="cash-fields show" id="cashFields">
           <div class="form-group">
-            <label for="cashAmount">¿Con cuánto abonás? (para el cambio)</label>
-            <input type="number" id="cashAmount" placeholder="Ej: 10000 (o dejá vacío si es justo)">
+            <label>Método de Pago</label>
+            <div class="payment-options">
+              <div class="payment-option">
+                <input type="radio" id="cash" name="paymentType" value="cash" checked>
+                <label for="cash"><span>💵</span>Efectivo</label>
+              </div>
+              <div class="payment-option">
+                <input type="radio" id="mercadopago" name="paymentType" value="mercadopago">
+                <label for="mercadopago"><span>💙</span>Mercado Pago</label>
+              </div>
+            </div>
           </div>
-        </div>
 
-        <div class="mp-fields" id="mpFields">
-          <div class="mp-box">
-            <p>Transferí al siguiente Alias:</p>
-            <p class="mp-alias">Giuliana.more.alias</p>
-            <p><small>⚠️ Recordá enviar el comprobante por WhatsApp al confirmar.</small></p>
+          <div class="form-group">
+            <label for="clientName">Nombre completo</label>
+            <input type="text" id="clientName" required placeholder="Tu nombre">
           </div>
-        </div>
 
-        <div class="form-group">
-          <label for="clientNotes">Notas adicionales</label>
-          <textarea id="clientNotes" placeholder="Aclaraciones sobre tu pedido..."></textarea>
-        </div>
-      </form>
+          <div class="address-fields" id="addressFields">
+            <div class="form-group">
+              <label for="clientAddress">Dirección de entrega</label>
+              <input type="text" id="clientAddress" placeholder="Calle y número">
+            </div>
+          </div>
 
-      <div class="cart-footer">
-        <div class="cart-total">
-          <span>Total:</span>
-          <span id="cartTotal">$0</span>
+          <div class="cash-fields show" id="cashFields">
+            <div class="form-group">
+              <label for="cashAmount">¿Con cuánto abonás? (para el cambio)</label>
+              <input type="number" id="cashAmount" placeholder="Ej: 10000 (o dejá vacío si es justo)">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="clientNotes">Notas adicionales</label>
+            <textarea id="clientNotes" placeholder="Aclaraciones sobre tu pedido..."></textarea>
+          </div>
+        </form>
+
+        <div class="cart-footer">
+          <div class="cart-total">
+            <span>Total:</span>
+            <span id="cartTotal">$0</span>
+          </div>
+          <button class="btn btn-primary checkout-btn" id="checkoutBtn" disabled>Confirmar Pedido</button>
         </div>
-        <button class="btn btn-primary checkout-btn" id="checkoutBtn" disabled>Confirmar Pedido</button>
       </div>
+
+      <!-- Vista Secundaria para Transferencia Mercado Pago -->
+      <div class="mp-confirmation" id="mpConfirmationView">
+        <div style="font-size: 3rem;">💙</div>
+        <h4>¡Último paso!</h4>
+        <p style="color: var(--text-muted); font-size: 0.9rem;">Realizá la transferencia por el monto total de tu pedido:</p>
+        <div class="mp-amount" id="mpTotalDisplay">$0</div>
+        
+        <div class="mp-box">
+          <p style="font-size: 0.85rem; color: var(--text-muted);">Alias de Mercado Pago:</p>
+          <p class="mp-alias">Giuliana.more.alias</p>
+          <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.4rem;">💡 Toca el alias para copiarlo</p>
+        </div>
+
+        <p style="font-size: 0.85rem; color: #ff6b81;">⚠️ Recordá enviar el comprobante por WhatsApp a continuación para empezar a preparar tu pedido.</p>
+
+        <button class="btn btn-primary checkout-btn" id="continueMpBtn">Ir a WhatsApp para enviar comprobante</button>
+      </div>
+
     </div>
   </div>
 
@@ -742,6 +775,7 @@
     ];
 
     let cart = [];
+    let pendingWhatsappUrl = "";
 
     document.getElementById('whatsappDisplay').textContent = `+${PHONE_NUMBER}`;
     document.getElementById('footerWhatsapp').href = `https://wa.me/${PHONE_NUMBER}`;
@@ -761,7 +795,11 @@
     const cashRadio = document.getElementById('cash');
     const mpRadio = document.getElementById('mercadopago');
     const cashFields = document.getElementById('cashFields');
-    const mpFields = document.getElementById('mpFields');
+    const cartMainView = document.getElementById('cartMainView');
+    const mpConfirmationView = document.getElementById('mpConfirmationView');
+    const mpTotalDisplay = document.getElementById('mpTotalDisplay');
+    const continueMpBtn = document.getElementById('continueMpBtn');
+    const panelTitle = document.getElementById('panelTitle');
     const toast = document.getElementById('toast');
 
     function renderMenu() {
@@ -849,7 +887,17 @@
       setTimeout(() => toast.classList.remove('show'), 2000);
     }
 
-    cartToggle.addEventListener('click', () => cartOverlay.classList.add('open'));
+    function resetCartView() {
+      cartMainView.style.display = 'flex';
+      mpConfirmationView.classList.remove('show');
+      panelTitle.textContent = 'Tu Pedido';
+    }
+
+    cartToggle.addEventListener('click', () => {
+      resetCartView();
+      cartOverlay.classList.add('open');
+    });
+
     closeCart.addEventListener('click', () => cartOverlay.classList.remove('open'));
     cartOverlay.addEventListener('click', (e) => {
       if (e.target === cartOverlay) cartOverlay.classList.remove('open');
@@ -858,14 +906,8 @@
     takeawayRadio.addEventListener('change', () => addressFields.classList.remove('show'));
     deliveryRadio.addEventListener('change', () => addressFields.classList.add('show'));
 
-    cashRadio.addEventListener('change', () => {
-      cashFields.classList.add('show');
-      mpFields.classList.remove('show');
-    });
-    mpRadio.addEventListener('change', () => {
-      cashFields.classList.remove('show');
-      mpFields.classList.add('show');
-    });
+    cashRadio.addEventListener('change', () => cashFields.classList.add('show'));
+    mpRadio.addEventListener('change', () => cashFields.classList.remove('show'));
 
     checkoutBtn.addEventListener('click', () => {
       const name = document.getElementById('clientName').value.trim();
@@ -908,7 +950,23 @@
       text += `\n*Total a pagar:* $${totalPrice.toLocaleString()}`;
 
       const url = `https://wa.me/${PHONE_NUMBER}?text=${encodeURIComponent(text)}`;
-      window.open(url, '_blank');
+
+      if (isCash) {
+        window.open(url, '_blank');
+      } else {
+        // Guardar URL y mostrar pantalla de MP con Alias
+        pendingWhatsappUrl = url;
+        mpTotalDisplay.textContent = `$${totalPrice.toLocaleString()}`;
+        cartMainView.style.display = 'none';
+        mpConfirmationView.classList.add('show');
+        panelTitle.textContent = 'Pago por Mercado Pago';
+      }
+    });
+
+    continueMpBtn.addEventListener('click', () => {
+      if (pendingWhatsappUrl) {
+        window.open(pendingWhatsappUrl, '_blank');
+      }
     });
 
     renderMenu();

@@ -53,11 +53,13 @@
       text-decoration: none;
       color: var(--text);
     }
-    .logo img {
-      height: 52px;
-      width: auto;
+    .logo-img {
+      height: 48px;
+      width: 48px;
       border-radius: 50%;
       object-fit: cover;
+      border: 2px solid var(--accent);
+      background: var(--card);
     }
     .logo-text {
       font-family: 'Playfair Display', serif;
@@ -185,15 +187,6 @@
     .btn-primary:hover {
       transform: translateY(-2px);
       box-shadow: 0 12px 30px rgba(196,30,58,0.5);
-    }
-    .btn-outline {
-      background: transparent;
-      color: var(--text);
-      border: 1.5px solid rgba(255,255,255,0.2);
-    }
-    .btn-outline:hover {
-      border-color: var(--text);
-      background: rgba(255,255,255,0.05);
     }
     .info-bar {
       background: var(--card);
@@ -553,7 +546,7 @@
       .menu-grid { grid-template-columns: 1fr; }
       .info-bar-inner { gap: 1rem; font-size: 0.85rem; }
       .cart-panel { max-width: 100%; }
-      .logo img { height: 44px; }
+      .logo-img { height: 40px; width: 40px; }
     }
     .toast {
       position: fixed;
@@ -580,6 +573,8 @@
   <header>
     <div class="header-inner">
       <a href="#" class="logo">
+        <!-- Reemplazá logo.png por el archivo o URL de tu logo -->
+        <img src="logo.png" alt="MORDISCO Logo" class="logo-img" onerror="this.style.display='none'">
         <span class="logo-text">MORDISCO</span>
       </a>
       <button class="cart-btn" id="cartToggle">
@@ -605,6 +600,7 @@
       <div class="info-bar-inner">
         <div class="info-item">📍 <strong>Ubicación:</strong> Francisco de la Reta 815, Mendoza</div>
         <div class="info-item">🛵 <strong>Servicio:</strong> Delivery & Take Away</div>
+        <div class="info-item">💬 <strong>WhatsApp:</strong> <span id="whatsappDisplay">Cargando...</span></div>
       </div>
     </div>
 
@@ -666,7 +662,6 @@
     </div>
   </div>
 
-  <!-- Toast Notificación -->
   <div class="toast" id="toast">Producto agregado al carrito</div>
 
   <footer>
@@ -678,6 +673,7 @@
       <div class="footer-col">
         <h4>Contacto</h4>
         <p>📍 Francisco de la Reta 815, Mendoza</p>
+        <p>💬 WhatsApp: <a href="#" id="footerWhatsapp">Enviar mensaje</a></p>
       </div>
     </div>
     <div class="footer-bottom">
@@ -686,6 +682,9 @@
   </footer>
 
   <script>
+    // ⚠️ REEMPLAZÁ ESTE NÚMERO POR TU WHATSAPP REAL (Ej: 5492611234567)
+    const PHONE_NUMBER = "5492611234567";
+
     const MENU_DATA = [
       { id: 1, name: "Mordisco clasica", desc: "Medallon de carne, doble queso cheddar, porción de papas.", price: 7500, emoji: "🍔" },
       { id: 2, name: "Mordisco Americana", desc: "Doble medallon de carne, doble queso cheddar, panceta, salsa moridisco.", price: 9500, emoji: "🥓" },
@@ -696,7 +695,10 @@
 
     let cart = [];
 
-    // DOM Elements
+    // Mostrar número en la pantalla
+    document.getElementById('whatsappDisplay').textContent = `+${PHONE_NUMBER}`;
+    document.getElementById('footerWhatsapp').href = `https://wa.me/${PHONE_NUMBER}`;
+
     const menuGrid = document.getElementById('menuGrid');
     const cartToggle = document.getElementById('cartToggle');
     const cartOverlay = document.getElementById('cartOverlay');
@@ -711,7 +713,6 @@
     const addressFields = document.getElementById('addressFields');
     const toast = document.getElementById('toast');
 
-    // Render Menu
     function renderMenu() {
       menuGrid.innerHTML = MENU_DATA.map(item => `
         <div class="card">
@@ -728,7 +729,6 @@
       `).join('');
     }
 
-    // Cart Actions
     window.addToCart = function(id) {
       const item = MENU_DATA.find(p => p.id === id);
       const existing = cart.find(ci => ci.id === id);
@@ -798,18 +798,15 @@
       setTimeout(() => toast.classList.remove('show'), 2000);
     }
 
-    // Toggle Cart Overlay
     cartToggle.addEventListener('click', () => cartOverlay.classList.add('open'));
     closeCart.addEventListener('click', () => cartOverlay.classList.remove('open'));
     cartOverlay.addEventListener('click', (e) => {
       if (e.target === cartOverlay) cartOverlay.classList.remove('open');
     });
 
-    // Handle Delivery Option Switch
     takeawayRadio.addEventListener('change', () => addressFields.classList.remove('show'));
     deliveryRadio.addEventListener('change', () => addressFields.classList.add('show'));
 
-    // Checkout via WhatsApp
     checkoutBtn.addEventListener('click', () => {
       const name = document.getElementById('clientName').value.trim();
       const isDelivery = deliveryRadio.checked;
@@ -840,8 +837,7 @@
       const totalPrice = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
       text += `\n*Total a pagar:* $${totalPrice.toLocaleString()}`;
 
-      const phone = "5492610000000"; 
-      const url = `https://wa.me/${phone}?text=${encodeURIComponent(text)}`;
+      const url = `https://wa.me/${PHONE_NUMBER}?text=${encodeURIComponent(text)}`;
       window.open(url, '_blank');
     });
 

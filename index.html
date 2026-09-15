@@ -309,6 +309,12 @@
       overflow: hidden;
     }
 
+    .card-img img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
     .card-body {
       padding: 1.5rem;
       flex: 1;
@@ -911,7 +917,7 @@
 const PHONE_NUMBER = "5492616425626";
 
 const MENU_DATA = [
-  { id: 1, name: "Mordisco Clasica", desc: "Medallon de carne, doble queso cheddar, porción de papas.", price: 7500, emoji: "🍔" },
+  { id: 1, name: "Mordisco Clasica", desc: "Medallon de carne, doble queso cheddar, porción de papas.", price: 7500, img: "burguer clasica.png" },
   { id: 2, name: "Mordisco Americana", desc: "Doble medallon de carne, doble queso cheddar, panceta, salsa moridisco.", price: 9500, emoji: "🥓" },
   { id: 3, name: "Big Mordisco (12 CM)", desc: "4 medallones de carne, panceta, huevo frito, doble queso cheddar, salsa moridisco, porción de papas.", price: 18900, emoji: "👑" },
   { id: 4, name: "Triple Mordisco", desc: "3 medallones de carne, doble cheddar, huevo frito, cebolla, salsa mordisco y porcion de papas.", price: 16500, emoji: "🔥" },
@@ -949,7 +955,9 @@ const toast = document.getElementById('toast');
 function renderMenu() {
   menuGrid.innerHTML = MENU_DATA.map(item => `
     <div class="card">
-      <div class="card-img">${item.emoji}</div>
+      <div class="card-img">
+        ${item.img ? `<img src="${item.img}" alt="${item.name}">` : item.emoji}
+      </div>
       <div class="card-body">
         <h3 class="card-title">${item.name}</h3>
         <p class="card-desc">${item.desc}</p>
